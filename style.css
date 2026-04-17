@@ -1,0 +1,478 @@
+/* ============================================
+   HypeTrends - Main Stylesheet
+   CIT2011 Web Programming - UTech Jamaica
+   ============================================ */
+
+/* CSS Variables (reusable colours) */
+:root {
+    --primary:  #0f172a;   /* dark navy background */
+    --secondary: #1e293b;  /* slightly lighter navy for cards */
+    --accent:   #38bdf8;   /* sky blue accent */
+    --accent2:  #0ea5e9;   /* slightly darker accent for gradients */
+    --text:     #f1f5f9;   /* off-white text */
+    --danger:   #ef4444;   /* red for errors */
+    --success:  #22c55e;   /* green for success */
+    --border:   #334155;   /* subtle border colour */
+}
+
+/* ---- RESET & BASE ---- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--primary);
+    color: var(--text);
+    text-align: center;
+    min-height: 100vh;
+}
+
+body.home-page {
+    background: var(--primary);
+}
+
+/* ---- NAVBAR ---- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: #000;
+    position: sticky;         /* sticks to top when scrolling */
+    top: 0;
+    z-index: 999;
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar h1 {
+    color: var(--accent);
+    font-size: 1.6rem;
+    letter-spacing: 2px;
+}
+
+.navbar ul {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.navbar a:hover {
+    color: var(--accent);  /* highlight on hover */
+}
+
+/* ---- HERO SECTION (index.html) ---- */
+.hero {
+    min-height: calc(100vh - 73px);
+    background-image: url('Assets/hero.jpg');
+    background-size: cover;
+    background-position: center 20%;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-text {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 30px 40px;
+    border-radius: 10px;
+}
+
+.hero-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.hero-text p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #cbd5e1;
+}
+
+/* ---- BUTTONS (reusable) ---- */
+button, .btn {
+    background: linear-gradient(45deg, var(--accent), var(--accent2));
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* Small qty buttons in cart */
+.qty-btn {
+    padding: 4px 12px;
+    font-size: 14px;
+    border-radius: 20px;
+    margin: 0 3px;
+}
+
+/* Danger button (clear cart, etc.) */
+.btn-danger {
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+}
+
+/* ---- PRODUCTS PAGE ---- */
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 30px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.product {
+    background: var(--secondary);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s;
+}
+
+.product:hover {
+    transform: translateY(-4px);  /* subtle lift on hover */
+}
+
+.product img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.product h3 {
+    margin: 8px 0 4px;
+    font-size: 1rem;
+}
+
+.product p {
+    color: var(--accent);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* ---- FORMS (login, register, checkout) ---- */
+.form-container {
+    max-width: 420px;
+    margin: 40px auto;
+    background: var(--secondary);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--accent);
+}
+
+.form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.form-container input {
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    background: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.form-container input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.form-container button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+}
+
+/* Message paragraphs (success/error) */
+.message {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+/* ---- CART PAGE ---- */
+.cart-container {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 0 20px;
+    text-align: left;
+}
+
+.cart-container h2 {
+    text-align: center;
+    color: var(--accent);
+    margin-bottom: 20px;
+}
+
+.cart-item {
+    background: var(--secondary);
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cart-item-name {
+    font-weight: bold;
+    flex: 1;
+}
+
+.cart-totals {
+    background: var(--secondary);
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin: 20px 0;
+    line-height: 2;
+}
+
+.cart-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+/* ---- CHECKOUT PAGE ---- */
+.checkout-container {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.checkout-summary {
+    background: var(--secondary);
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    text-align: left;
+    margin-bottom: 20px;
+    line-height: 1.9;
+}
+
+/* ---- INVOICE PAGE ---- */
+.invoice-container {
+    max-width: 600px;
+    margin: 30px auto;
+    background: var(--secondary);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
+.invoice-header {
+    text-align: center;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.invoice-header h2 {
+    color: var(--accent);
+    font-size: 1.8rem;
+}
+
+.invoice-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.invoice-totals {
+    margin-top: 15px;
+    background: var(--primary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    line-height: 2;
+}
+
+/* ---- DASHBOARD / ANALYTICS PAGE ---- */
+.dashboard-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.dashboard-container h2 {
+    color: var(--accent);
+    margin-bottom: 20px;
+}
+
+.dashboard-section {
+    background: var(--secondary);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.dashboard-section h3 {
+    color: var(--accent);
+    margin-bottom: 14px;
+    font-size: 1.1rem;
+}
+
+/* Bar chart made with divs */
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar-label {
+    width: 140px;
+    font-size: 0.85rem;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.bar-fill {
+    height: 28px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #0f172a;
+    transition: width 0.6s ease;
+    min-width: 30px;
+}
+
+/* Invoice table on dashboard */
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.invoice-table th, .invoice-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.invoice-table th {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.invoice-table tr:hover {
+    background: rgba(56, 189, 248, 0.05);
+}
+
+/* ---- PAGE TITLE ---- */
+.page-title {
+    padding: 30px 20px 10px;
+    font-size: 1.8rem;
+    color: var(--accent);
+}
+
+/* ---- ABOUT PAGE ---- */
+.about-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: var(--secondary);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+    line-height: 2;
+}
+
+.about-container h2 {
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.about-container a {
+    color: var(--accent);
+}
+
+/* ---- LOCKED MESSAGE ---- */
+.locked-msg {
+    color: var(--danger);
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .navbar ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .bar-label {
+        width: 100px;
+        font-size: 0.75rem;
+    }
+}
