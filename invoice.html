@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - HypeTrends</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>HypeTrends</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <!-- Invoice Content - filled by displayInvoice() in script.js -->
+    <div class="invoice-container">
+        <div id="invoiceContent">
+            <!-- Invoice is generated here dynamically -->
+        </div>
+    </div>
+
+    <!-- Action buttons after invoice -->
+    <div style="text-align:center; margin: 20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="products.html"><button>Continue Shopping 🛍️</button></a>
+        <a href="dashboard.html"><button>View Dashboard 📊</button></a>
+        <button onclick="window.print()">Print Invoice 🖨️</button>
+    </div>
+
+    <script src="../script.js"></script>
+</body>
+</html>

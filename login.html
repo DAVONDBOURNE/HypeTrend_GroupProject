@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - HypeTrends</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>HypeTrends</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="form-container">
+        <h2>Login</h2>
+
+        <form id="loginForm">
+
+            <!-- Login uses TRN not username -->
+            <label for="trn">TRN (9 digits)</label>
+            <input type="text" id="trn" placeholder="Enter your TRN" maxlength="9">
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <!-- Error / success message appears here -->
+        <p id="loginError" class="message"></p>
+
+        <p style="text-align:center; margin-top:12px; font-size:0.9rem;">
+            Don't have an account? <a href="register.html" style="color:var(--accent)">Register here</a>
+        </p>
+    </div>
+
+    <script src="../script.js"></script>
+</body>
+</html>
