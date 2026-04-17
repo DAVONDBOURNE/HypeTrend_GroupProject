@@ -30,17 +30,24 @@
 
             <!-- Login uses TRN not username -->
             <label for="trn">TRN (9 digits)</label>
-            <input type="text" id="trn" placeholder="Enter your TRN" maxlength="9">
+            <input type="text" id="trn" placeholder="Enter your TRN" maxlength="9" required>
 
             <label for="password">Password</label>
-            <input type="password" id="password" placeholder="Enter your password">
+            <input type="password" id="password" placeholder="Enter your password" required>
 
-            <button type="submit">Login</button>
+            <div class="form-actions">
+                <button type="submit">Login</button>
+                <button type="button" id="loginCancel" class="btn-secondary">Cancel</button>
+            </div>
 
         </form>
 
         <!-- Error / success message appears here -->
         <p id="loginError" class="message"></p>
+
+        <p style="text-align:center; margin-top:10px; font-size:0.95rem;">
+            <a href="reset-password.html" style="color:var(--accent)">Reset Password</a>
+        </p>
 
         <p style="text-align:center; margin-top:12px; font-size:0.9rem;">
             Don't have an account? <a href="register.html" style="color:var(--accent)">Register here</a>

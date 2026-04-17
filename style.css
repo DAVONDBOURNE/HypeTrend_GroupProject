@@ -211,7 +211,19 @@ button:active {
     font-size: 0.95rem;
 }
 
-.form-container input:focus {
+.form-container select {
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    background: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.form-container input:focus,
+.form-container select:focus {
     outline: none;
     border-color: var(--accent);
 }
@@ -220,6 +232,41 @@ button:active {
     width: 100%;
     padding: 12px;
     font-size: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secondary {
+    background: #475569;
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 0 15px rgba(148, 163, 184, 0.45);
+}
+
+.status-card {
+    text-align: center;
+}
+
+.status-text {
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.status-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.status-actions .btn {
+    text-decoration: none;
+    display: inline-block;
+    width: auto;
 }
 
 /* Message paragraphs (success/error) */
@@ -415,6 +462,37 @@ button:active {
 
 .invoice-table tr:hover {
     background: rgba(56, 189, 248, 0.05);
+}
+
+.invoice-search-panel {
+    background: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.invoice-search-panel h2 {
+    color: var(--accent);
+    margin-bottom: 14px;
+}
+
+.invoice-search-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.invoice-search-controls input {
+    flex: 1 1 260px;
+    min-width: 220px;
+    padding: 10px 14px;
+    background: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.95rem;
 }
 
 /* ---- PAGE TITLE ---- */

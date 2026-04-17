@@ -14,7 +14,7 @@
         <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="products.html">Products</a></li>
-            <li><a href="cart.html">Cart</a></li>
+            <li><a href="cart.html">Cart (0)</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="login.html">Login</a></li>
             <li><a href="register.html">Register</a></li>
@@ -24,6 +24,15 @@
 
     <!-- Invoice Content - filled by displayInvoice() in script.js -->
     <div class="invoice-container">
+        <div class="invoice-search-panel">
+            <h2>Find Invoice</h2>
+            <div class="invoice-search-controls">
+                <input type="text" id="invoiceSearchInput" placeholder="Search by invoice number, TRN, name, email or phone">
+                <button type="button" onclick="searchInvoices()">Search</button>
+                <button type="button" class="btn-secondary" onclick="clearInvoiceSearch()">Clear</button>
+            </div>
+            <p id="invoiceSearchMessage" class="message"></p>
+        </div>
         <div id="invoiceContent">
             <!-- Invoice is generated here dynamically -->
         </div>

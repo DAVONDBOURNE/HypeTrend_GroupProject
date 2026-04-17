@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
             let fullName    = document.getElementById("fullName").value.trim();
             let dob         = document.getElementById("dob").value;
             let email       = document.getElementById("email").value.trim();
+            let gender      = document.getElementById("gender").value;
+            let phoneNumber = document.getElementById("phoneNumber").value.trim();
             let trn         = document.getElementById("trn").value.trim();
             let password    = document.getElementById("password").value;
             let confirmPass = document.getElementById("confirmPassword").value;
@@ -31,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
             /* --- PROCESS: Validate each field --- */
 
             /* Check all fields are filled */
-            if (!fullName || !dob || !email || !trn || !password || !confirmPass) {
+            if (!fullName || !dob || !email || !gender || !phoneNumber || !trn || !password || !confirmPass) {
                 showMessage(message, "All fields are required.", "red");
                 return;
             }
@@ -46,6 +48,12 @@ document.addEventListener("DOMContentLoaded", function () {
             let trnPattern = /^\d{9}$/; /* regex: 9 numbers only */
             if (!trnPattern.test(trn)) {
                 showMessage(message, "TRN must be exactly 9 digits.", "red");
+                return;
+            }
+
+            let phonePattern = /^\d{7,15}$/;
+            if (!phonePattern.test(phoneNumber)) {
+                showMessage(message, "Phone number must contain 7 to 15 digits.", "red");
                 return;
             }
 
@@ -93,6 +101,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 fullName: fullName,
                 dob:      dob,
                 email:    email,
+                gender:   gender,
+                phoneNumber: phoneNumber,
                 trn:      trn,
                 password: password
             };
@@ -119,20 +129,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if (loginForm) {
 
         let errorMsg = document.getElementById("loginError");
+        let cancelBtn = document.getElementById("loginCancel");
 
-        /* Get current attempt count from localStorage (persists between refreshes) */
-        let attempts = parseInt(localStorage.getItem("loginAttempts")) || 0;
-        let lockTime = parseInt(localStorage.getItem("lockTime")) || 0;
-
-        /* Check if currently locked out */
-        checkLock(errorMsg, lockTime);
+        showStoredAttemptState(errorMsg);
 
         loginForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
-            /* Re-check lock every time they try */
-            let now = Date.now();
-            if (checkLock(errorMsg, lockTime)) return;
+            if (isAccountLocked()) {
+                window.location.href = "account-locked.html";
+                return;
+            }
 
             /* --- INPUT: Get TRN and password --- */
             let trn      = document.getElementById("trn").value.trim();
@@ -154,8 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
             /* --- OUTPUT: Handle result --- */
             if (matchedUser) {
                 /* Correct login - reset attempts and save logged-in user */
-                localStorage.removeItem("loginAttempts");
-                localStorage.removeItem("lockTime");
+                clearLoginState();
                 localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
 
                 showMessage(errorMsg, "Login successful! Redirecting...", "green");
@@ -166,21 +172,85 @@ document.addEventListener("DOMContentLoaded", function () {
 
             } else {
                 /* Wrong credentials - increment attempt counter */
-                attempts++;
+                let attempts = (parseInt(localStorage.getItem("loginAttempts"), 10) || 0) + 1;
                 localStorage.setItem("loginAttempts", attempts);
 
                 let remaining = 3 - attempts;
 
                 if (attempts >= 3) {
-                    /* Lock the user out for 30 seconds */
-                    let lockUntil = Date.now() + 30000; /* 30 seconds in ms */
-                    localStorage.setItem("lockTime", lockUntil);
-                    showMessage(errorMsg, "Too many failed attempts! Locked for 30 seconds.", "red");
+                    localStorage.setItem("accountLocked", "true");
+                    showMessage(errorMsg, "Too many failed attempts. Redirecting to the account locked page...", "red");
+                    setTimeout(function () {
+                        window.location.href = "account-locked.html";
+                    }, 1000);
                 } else {
                     showMessage(errorMsg, "Incorrect TRN or password. " + remaining + " attempt(s) left.", "red");
                 }
             }
         });
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener("click", function () {
+                loginForm.reset();
+                showMessage(errorMsg, "", "");
+            });
+        }
+    }
+
+    let resetPasswordForm = document.getElementById("resetPasswordForm");
+
+    if (resetPasswordForm) {
+        let resetMessage = document.getElementById("resetPasswordMessage");
+        let cancelResetBtn = document.getElementById("resetPasswordCancel");
+
+        resetPasswordForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            let resetTrn = document.getElementById("resetTrn").value.trim();
+            let newPassword = document.getElementById("newPassword").value;
+            let confirmNewPassword = document.getElementById("confirmNewPassword").value;
+            let allUsers = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+            let userIndex = allUsers.findIndex(function (user) {
+                return user.trn === resetTrn;
+            });
+
+            if (!/^\d{9}$/.test(resetTrn)) {
+                showMessage(resetMessage, "Enter a valid 9-digit TRN.", "red");
+                return;
+            }
+
+            if (userIndex === -1) {
+                showMessage(resetMessage, "No registered account was found for that TRN.", "red");
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                showMessage(resetMessage, "Password must be at least 8 characters.", "red");
+                return;
+            }
+
+            if (newPassword !== confirmNewPassword) {
+                showMessage(resetMessage, "Passwords do not match.", "red");
+                return;
+            }
+
+            allUsers[userIndex].password = newPassword;
+            localStorage.setItem("RegistrationData", JSON.stringify(allUsers));
+            clearLoginState();
+
+            showMessage(resetMessage, "Password updated successfully. Redirecting to login...", "green");
+
+            setTimeout(function () {
+                window.location.href = "login.html";
+            }, 1200);
+        });
+
+        if (cancelResetBtn) {
+            cancelResetBtn.addEventListener("click", function () {
+                resetPasswordForm.reset();
+                showMessage(resetMessage, "", "");
+            });
+        }
     }
 
 
@@ -193,6 +263,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("cartItems")) {
         displayCart();
     }
+
+    updateCartDisplay();
 
     /* Display summary on checkout page */
     if (document.getElementById("summary")) {
@@ -226,19 +298,26 @@ function showMessage(element, text, colour) {
    HELPER FUNCTION: Check if user is locked out
    Returns true if locked, false if not
    ============================================================ */
-function checkLock(errorElement, lockTime) {
-    let now = Date.now();
-    if (lockTime && now < lockTime) {
-        let secondsLeft = Math.ceil((lockTime - now) / 1000);
-        showMessage(errorElement, "Account locked. Try again in " + secondsLeft + " seconds.", "red");
-        return true; /* still locked */
+function isAccountLocked() {
+    return localStorage.getItem("accountLocked") === "true";
+}
+
+function clearLoginState() {
+    localStorage.removeItem("loginAttempts");
+    localStorage.removeItem("lockTime");
+    localStorage.removeItem("accountLocked");
+}
+
+function showStoredAttemptState(errorElement) {
+    if (isAccountLocked()) {
+        showMessage(errorElement, "This account is locked. Reset your password to continue.", "red");
+        return;
     }
-    /* Lock expired - clean up */
-    if (lockTime && now >= lockTime) {
-        localStorage.removeItem("loginAttempts");
-        localStorage.removeItem("lockTime");
+
+    let attempts = parseInt(localStorage.getItem("loginAttempts"), 10) || 0;
+    if (attempts > 0) {
+        showMessage(errorElement, "Incorrect login detected earlier. " + (3 - attempts) + " attempt(s) remaining.", "red");
     }
-    return false; /* not locked */
 }
 
 
@@ -265,7 +344,7 @@ function addToCart(name, price) {
 
     /* Save updated cart */
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert(name + " added to cart!");
+    updateCartDisplay();
 }
 
 
@@ -278,6 +357,7 @@ function displayCart() {
 
     /* Load cart from localStorage */
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    updateCartDisplay();
 
     /* If cart is empty */
     if (cart.length === 0) {
@@ -338,6 +418,7 @@ function changeQty(name, change) {
     });
 
     localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartDisplay();
     displayCart(); /* refresh the display */
 }
 
@@ -349,6 +430,7 @@ function removeItem(name) {
         return item.name !== name; /* keep everything EXCEPT this item */
     });
     localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartDisplay();
     displayCart();
 }
 
@@ -356,6 +438,7 @@ function removeItem(name) {
 /* Clear the entire cart */
 function clearCart() {
     localStorage.removeItem("cart");
+    updateCartDisplay();
     displayCart();
 }
 
@@ -450,7 +533,13 @@ function confirmOrder() {
     let invoiceNum = "INV" + Date.now();
 
     /* Get logged in user (if any) */
-    let loggedUser = JSON.parse(localStorage.getItem("loggedInUser")) || { fullName: name, trn: "GUEST" };
+    let loggedUser = JSON.parse(localStorage.getItem("loggedInUser")) || {
+        fullName: name,
+        trn: "GUEST",
+        gender: "Not provided",
+        phoneNumber: "Not provided",
+        email: "Not provided"
+    };
 
     /* Build invoice object */
     let invoice = {
@@ -458,6 +547,9 @@ function confirmOrder() {
         date:        new Date().toLocaleDateString(),
         customerName: name,
         customerTRN:  loggedUser.trn,
+        customerGender: loggedUser.gender || "Not provided",
+        customerPhoneNumber: loggedUser.phoneNumber || "Not provided",
+        customerEmail: loggedUser.email || "Not provided",
         address:      address,
         items:        cart,
         subtotal:     subtotal,
@@ -475,9 +567,11 @@ function confirmOrder() {
 
     /* Save current invoice separately for invoice.html to read */
     localStorage.setItem("currentInvoice", JSON.stringify(invoice));
+    localStorage.setItem("selectedInvoiceNum", invoice.invoiceNum);
 
     /* Clear the cart after successful order */
     localStorage.removeItem("cart");
+    updateCartDisplay();
 
     /* Go to invoice page */
     window.location.href = "invoice.html";
@@ -494,8 +588,8 @@ function displayInvoice() {
     let container = document.getElementById("invoiceContent");
     if (!container) return;
 
-    /* Load the invoice that was just created */
-    let inv = JSON.parse(localStorage.getItem("currentInvoice"));
+    /* Load the invoice that was just created or a searched invoice */
+    let inv = getSelectedInvoice();
 
     if (!inv) {
         container.innerHTML = "<p style='color:#94a3b8;text-align:center;'>No invoice found.</p>";
@@ -526,6 +620,18 @@ function displayInvoice() {
         <div class="invoice-row">
             <span><b>TRN:</b></span>
             <span>${inv.customerTRN}</span>
+        </div>
+        <div class="invoice-row">
+            <span><b>Gender:</b></span>
+            <span>${inv.customerGender || "Not provided"}</span>
+        </div>
+        <div class="invoice-row">
+            <span><b>Phone Number:</b></span>
+            <span>${inv.customerPhoneNumber || "Not provided"}</span>
+        </div>
+        <div class="invoice-row">
+            <span><b>Email:</b></span>
+            <span>${inv.customerEmail || "Not provided"}</span>
         </div>
         <div class="invoice-row">
             <span><b>Address:</b></span>
@@ -610,7 +716,8 @@ function showInvoices() {
     let container = document.getElementById("invoiceTable");
     if (!container) return;
 
-    let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    let searchInput = document.getElementById("dashboardInvoiceSearch");
+    let allInvoices = getFilteredInvoices(searchInput ? searchInput.value : "");
 
     if (allInvoices.length === 0) {
         container.innerHTML = "<p style='color:#94a3b8;'>No invoices found.</p>";
@@ -626,6 +733,9 @@ function showInvoices() {
                     <th>Date</th>
                     <th>Customer</th>
                     <th>TRN</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Email</th>
                     <th>Total</th>
                 </tr>
             </thead>
@@ -637,6 +747,9 @@ function showInvoices() {
                     <td>${inv.date}</td>
                     <td>${inv.customerName}</td>
                     <td>${inv.customerTRN}</td>
+                    <td>${inv.customerGender || "Not provided"}</td>
+                    <td>${inv.customerPhoneNumber || "Not provided"}</td>
+                    <td>${inv.customerEmail || "Not provided"}</td>
                     <td>$${inv.total.toFixed(2)}</td>
                  </tr>`;
     });
@@ -691,4 +804,94 @@ function getUserInvoices() {
 
     html += "</tbody></table>";
     container.innerHTML = html;
+}
+
+function updateCartDisplay() {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let itemCount = cart.reduce(function (total, item) {
+        return total + item.qty;
+    }, 0);
+
+    document.querySelectorAll('a[href="cart.html"]').forEach(function (link) {
+        if (link.querySelector("button")) return;
+        link.textContent = "Cart (" + itemCount + ")";
+    });
+
+    let viewCartButton = document.getElementById("viewCartButton");
+    if (viewCartButton) {
+        viewCartButton.textContent = "View Cart (" + itemCount + ")";
+    }
+}
+
+function getFilteredInvoices(searchTerm) {
+    let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    let query = (searchTerm || "").trim().toLowerCase();
+
+    if (!query) {
+        return allInvoices;
+    }
+
+    return allInvoices.filter(function (inv) {
+        let haystack = [
+            inv.invoiceNum,
+            inv.customerName,
+            inv.customerTRN,
+            inv.customerGender,
+            inv.customerPhoneNumber,
+            inv.customerEmail,
+            inv.address
+        ].join(" ").toLowerCase();
+
+        return haystack.includes(query);
+    });
+}
+
+function getSelectedInvoice() {
+    let selectedInvoiceNum = localStorage.getItem("selectedInvoiceNum");
+    let currentInvoice = JSON.parse(localStorage.getItem("currentInvoice"));
+
+    if (selectedInvoiceNum) {
+        let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+        let selectedInvoice = allInvoices.find(function (inv) {
+            return inv.invoiceNum === selectedInvoiceNum;
+        });
+
+        if (selectedInvoice) {
+            return selectedInvoice;
+        }
+    }
+
+    return currentInvoice;
+}
+
+function searchInvoices() {
+    let searchInput = document.getElementById("invoiceSearchInput");
+    let messageEl = document.getElementById("invoiceSearchMessage");
+    if (!searchInput) return;
+
+    let matches = getFilteredInvoices(searchInput.value);
+
+    if (matches.length === 0) {
+        localStorage.removeItem("selectedInvoiceNum");
+        showMessage(messageEl, "No invoice matched that search.", "red");
+        displayInvoice();
+        return;
+    }
+
+    localStorage.setItem("selectedInvoiceNum", matches[0].invoiceNum);
+    showMessage(messageEl, "Showing invoice " + matches[0].invoiceNum + ".", "green");
+    displayInvoice();
+}
+
+function clearInvoiceSearch() {
+    let searchInput = document.getElementById("invoiceSearchInput");
+    let messageEl = document.getElementById("invoiceSearchMessage");
+
+    if (searchInput) {
+        searchInput.value = "";
+    }
+
+    localStorage.removeItem("selectedInvoiceNum");
+    showMessage(messageEl, "", "");
+    displayInvoice();
 }
